@@ -1,6 +1,6 @@
 {
   "appId": "com.salwa.iptv.webos",
-  "version": "0.1.98",
+  "version": "0.1.99",
   "channel": "developer",
   "installation": "Developer Mode using webOS Dev Manager or webOS CLI",
   "notes": "New TV settings, Arabic interface, playback and subtitle preferences, weekly catalog scheduling and app update check."
