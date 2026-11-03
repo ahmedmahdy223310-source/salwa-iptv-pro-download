@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Salwa IPTV for webOS — Privacy Policy</title>
+  <style>
+    body { max-width: 48rem; margin: 0 auto; padding: 2rem 1.2rem 4rem; background: #0b1423; color: #edf2f8; font: 1.05rem/1.65 system-ui, sans-serif; }
+    h1, h2 { line-height: 1.25; }
+    h2 { margin-top: 2rem; }
+    a { color: #84d4ee; }
+    .updated { color: #bac9d8; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Salwa IPTV for webOS — Privacy Policy</h1>
+    <p class="updated">Last updated: 3 November 2026</p>
+    <p>Salwa IPTV is a player for playlists and streams supplied by the user. The app does not provide channels or subscriptions and does not include analytics or advertising.</p>
+    <h2>Information you enter</h2>
+    <p>You may enter an M3U URL, single stream URL, or Xtream account. The TV requests playlist, catalog, artwork, and media data from the server you specify. The server can see your request, including credentials that form part of its URL. Use HTTPS when your provider offers it; HTTP does not encrypt the connection.</p>
+    <h2>Pairing from a phone</h2>
+    <p>The QR code opens a form hosted on GitHub Pages. You choose an M3U URL or Xtream account. The phone encrypts those details using an AES-GCM key in the QR link fragment before posting ciphertext to ntfy.sh. The TV retrieves and decrypts the message. The link expires after ten minutes. The key fragment is not sent as part of the GitHub Pages HTTP request. GitHub Pages and ntfy.sh may process connection details, such as IP addresses, under their own policies. The temporary relay may retain the encrypted message under its retention policy.</p>
+    <h2>Storage on the TV</h2>
+    <p>After a successful load, the app automatically saves an Xtream account or M3U playlist URL locally so it can reopen it next time. The saved details are encrypted with AES-GCM, but the automatic sign-in key is stored in the same TV app storage. Someone with access to that storage could recover the details. Signing out keeps the saved playlist; removing the saved user or deleting a saved playlist from My Playlists removes its local copy. An optional Save Account action also creates a separate passphrase-protected Xtream copy. The passphrase is not stored and cannot be recovered. Single stream URLs are used for the current app session only. Favorites and recently viewed entries are stored locally as URL fingerprints. Removing the app removes its local app data.</p>
+    <h2>Optional online subtitles</h2>
+    <p>If you enable online subtitle search, you supply your own SubDL API key. The key is saved encrypted on the TV, with its decryption key in the same TV app storage. The app sends the API key and the movie or episode title, language, and available identifiers to SubDL when you search or download subtitles. Your IPTV account credentials are not sent to SubDL. You can remove the saved SubDL key in Settings.</p>
+    <h2>Your choices and contact</h2>
+    <p>You choose which provider servers and optional services to use. You can remove saved playlists, accounts, and the SubDL key in the app. For privacy questions or deletion help, contact the publisher through <a href="https://github.com/ahmedmahdy223310-source/salwa-iptv-pro-download/issues">Salwa IPTV Pro download issues</a>.</p>
+  </main>
+</body>
+</html>
