@@ -5,29 +5,18 @@ function decodeBase64(value) {
 function validateSeason(value) {
   if (!value || typeof value.title !== 'string' || !Array.isArray(value.episodes) || !value.episodes.length || value.episodes.length > 1000) throw new Error('Invalid download list.');
   return { title: value.title.slice(0, 300), episodes: value.episodes.map(item => {
-    const url = new URL(item.url);
+    const compact = Array.isArray(item);
+    const url = compact ? new URL(item[1], value.base) : new URL(item.url);
     if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) throw new Error('Invalid video link.');
-    return { name: String(item.name || 'Episode').slice(0, 300), url: url.href };
+    return { name: String(compact ? 'Episode ' + item[0] : item.name || 'Episode').slice(0, 300), url: url.href };
   }) };
 }
-async function openSeason(params, request = fetch) {
-  const topic = params.get('t'), expires = Number(params.get('e'));
-  if (!/^salwa-download-[a-f0-9]{32}$/.test(topic || '') || !Number.isFinite(expires) || Date.now() > expires || expires > Date.now() + 11 * 60000) throw new Error('This QR has expired. Create a new one on your TV.');
+async function openSeason(params) {
   const keyBytes = decodeBase64(params.get('k') || ''), iv = decodeBase64(params.get('iv') || '');
   if (keyBytes.length !== 32 || iv.length !== 12) throw new Error('Invalid download key.');
-  const response = await request('https://ntfy.sh/' + topic + '/json?poll=1&since=' + Math.floor((expires - 11 * 60000) / 1000), { signal: AbortSignal.timeout(20000) });
-  if (!response.ok) throw new Error('Cannot reach the temporary transfer service. Try again.');
-  const text = await response.text();
-  if (text.length > 400000) throw new Error('Download list is too large.');
-  const chunks = new Map(); let total = 0;
-  for (const line of text.split('\n').filter(Boolean)) {
-    const message = JSON.parse(line); if (message.event !== 'message') continue;
-    const part = JSON.parse(message.message);
-    if (part.v !== 1 || !Number.isInteger(part.parts) || part.parts < 1 || part.parts > 100 || !Number.isInteger(part.part) || part.part < 0 || part.part >= part.parts || typeof part.data !== 'string' || part.data.length > 2800 || (total && total !== part.parts)) throw new Error('Invalid transfer.');
-    total = part.parts; chunks.set(part.part, part.data);
-  }
-  if (!total || chunks.size !== total) throw new Error('Download list is incomplete. Scan the QR again.');
-  const encrypted = decodeBase64(Array.from({ length: total }, (_, i) => chunks.get(i)).join(''));
+  const data = params.get('d') || '';
+  if (!data || data.length > 250000) throw new Error('Invalid download list.');
+  const encrypted = decodeBase64(data);
   const key = await crypto.subtle.importKey('raw', keyBytes, 'AES-GCM', false, ['decrypt']);
   return validateSeason(JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, encrypted))));
 }
