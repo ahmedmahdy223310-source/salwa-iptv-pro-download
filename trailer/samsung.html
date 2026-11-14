@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="strict-origin-when-cross-origin"><title>Salwa Samsung trailer</title><style>html,body,#player{margin:0;width:100%;height:100%;overflow:hidden;background:#000;color:white}#message{position:absolute;top:0;left:0;right:0;padding:10px;text-align:center;font:22px Arial;pointer-events:none}#message:empty{display:none}</style></head><body><div id="player"></div><div id="message">Loading trailer…</div><script>
+(function () {
+  'use strict';
+  var query=new URLSearchParams(location.search),id=query.get('v'),session=query.get('session'),player=null,ready=false;
+  var message=document.getElementById('message');
+  function send(type,value){parent.postMessage({source:'salwa-samsung-trailer',session:session,type:type,value:value},'*');}
+  if(!/^[A-Za-z0-9_-]{11}$/.test(id||'')||!/^[a-f0-9]{32}$/.test(session||'')){message.textContent='Invalid trailer request.';return;}
+  window.onYouTubeIframeAPIReady=function(){
+    player=new YT.Player('player',{host:'https://www.youtube-nocookie.com',videoId:id,
+      playerVars:{autoplay:1,playsinline:1,controls:1,disablekb:1,rel:0,origin:location.origin},events:{
+        onReady:function(){ready=true;message.textContent='';send('ready',true);player.playVideo();},
+        onStateChange:function(event){send('state',event.data);},
+        onError:function(event){message.textContent='This trailer is unavailable.';send('error',event.data);},
+        onAutoplayBlocked:function(){send('blocked',true);}
+      }});
+  };
+  window.addEventListener('message',function(event){
+    var data=event.data;
+    if(event.source!==parent||!data||data.source!=='salwa-samsung-trailer-command'||data.session!==session||!ready)return;
+    if(data.command==='play')player.playVideo();
+    else if(data.command==='pause')player.pauseVideo();
+    else if(data.command==='forward'||data.command==='rewind')player.seekTo(Math.max(0,player.getCurrentTime()+(data.command==='forward'?10:-10)),true);
+  });
+  window.addEventListener('keydown',function(event){if(event.keyCode===10009||event.keyCode===461||event.key==='Escape'){event.preventDefault();send('back',true);}});
+  document.addEventListener('visibilitychange',function(){if(document.hidden&&ready)player.pauseVideo();});
+  window.addEventListener('pagehide',function(){if(ready)player.pauseVideo();});
+  setInterval(function(){if(ready)send('time',{seconds:player.getCurrentTime(),state:player.getPlayerState()});},1000);
+  var script=document.createElement('script');script.src='https://www.youtube.com/iframe_api';script.onerror=function(){message.textContent='Cannot connect to YouTube.';send('error','connection');};document.body.appendChild(script);
+})();
+</script></body></html>
