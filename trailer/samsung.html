@@ -9,8 +9,8 @@
   window.onYouTubeIframeAPIReady=function(){
     player=new YT.Player('player',{host:'https://www.youtube-nocookie.com',videoId:id,
       playerVars:{autoplay:1,playsinline:1,controls:1,disablekb:1,rel:0,origin:location.origin},events:{
-        onReady:function(){ready=true;message.textContent='';send('ready',true);player.playVideo();},
-        onStateChange:function(event){send('state',event.data);},
+        onReady:function(){ready=true;message.textContent='';send('ready',true);if(!document.hidden)player.playVideo();else player.pauseVideo();},
+        onStateChange:function(event){if(event.data===1&&document.hidden)player.pauseVideo();send('state',event.data);},
         onError:function(event){message.textContent='This trailer is unavailable.';send('error',event.data);},
         onAutoplayBlocked:function(){send('blocked',true);}
       }});
@@ -18,7 +18,7 @@
   window.addEventListener('message',function(event){
     var data=event.data;
     if(event.source!==parent||!data||data.source!=='salwa-samsung-trailer-command'||data.session!==session||!ready)return;
-    if(data.command==='play')player.playVideo();
+    if(data.command==='play'&&!document.hidden)player.playVideo();
     else if(data.command==='pause')player.pauseVideo();
     else if(data.command==='forward'||data.command==='rewind')player.seekTo(Math.max(0,player.getCurrentTime()+(data.command==='forward'?10:-10)),true);
   });
